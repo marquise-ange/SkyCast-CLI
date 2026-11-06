@@ -1,0 +1,26 @@
+{
+  "name": "skycast-cli",
+  "version": "1.0.0",
+  "description": "A Node.js CLI tool for real-time weather updates and forecasts.",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "skycast": "./bin/skycast.js"
+  },
+  "scripts": {
+    "start": "node bin/skycast.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "weather",
+    "cli",
+    "nodejs",
+    "forecast",
+    "weather-api"
+  ],
+  "author": "Marquise Ange",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
