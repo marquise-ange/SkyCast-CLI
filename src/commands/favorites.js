@@ -29,4 +29,25 @@ async function listFavorites() {
     return data.favorites;
 }
 
-export { addFavorite, listFavorites };
+
+
+// Remove a city from favorites
+async function removeFavorite(city) {
+    const data = await readData();
+
+    const cityIndex = data.favorites.findIndex(
+        favorite => favorite.toLowerCase() === city.toLowerCase()
+    );
+
+    if (cityIndex === -1) {
+        return 'This city is not in your favorites.';
+    }
+
+    const removedCity = data.favorites.splice(cityIndex, 1)[0];
+
+    await saveData(data);
+
+    return `${removedCity} has been removed from your favorites.`;
+}
+
+export { addFavorite, listFavorites, removeFavorite };
