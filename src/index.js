@@ -3,6 +3,7 @@ import { parseArgs } from 'node:util';
 import { addFavorite, listFavorites, removeFavorite } from './commands/favorites.js';
 import { addHistory, listHistory } from './commands/history.js';
 import { getSettings, setUnits } from './commands/settings.js';
+import { showWeather } from './commands/weather.js';
 
 async function startSkyCast() {
     const { values, positionals } = parseArgs({
@@ -79,12 +80,18 @@ EXAMPLES:
     // Handle weather command
     if (command === 'weather') {
         if (!city) {
-            console.log('Error: Please provide a city name.');
+            console.error('Error: Please provide a city name.');
             process.exitCode = 1;
             return;
         }
 
-        console.log(`Weather requested for: ${city}`);
+        try {
+            await showWeather(city);
+        } catch (error) {
+            console.error(`Error: ${error.message}`);
+            process.exitCode = 1;
+        }
+
         return;
     }
 
