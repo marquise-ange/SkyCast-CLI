@@ -50,6 +50,12 @@ OPTIONS:
 EXAMPLES:
   skycast weather Kigali
   skycast forecast Nairobi
+  skycast favorite add Kigali
+  skycast favorite list
+  skycast favorite remove Kigali
+  skycast history list
+  skycast settings show
+  skycast settings set metric
         `);
         return;
     }
@@ -136,7 +142,7 @@ EXAMPLES:
             return;
         }
 
-        console.log('Unknown favorite command. Use add or list.');
+        console.log('Unknown favorite command. Use add, list, or remove.');
         process.exitCode = 1;
         return;
     }
