@@ -1,6 +1,8 @@
 
 import { parseArgs } from 'node:util';
 import { addFavorite, listFavorites, removeFavorite } from './commands/favorites.js';
+import { addHistory, listHistory } from './commands/history.js';
+
 async function startSkyCast() {
     const { values, positionals } = parseArgs({
         args: process.argv.slice(2),
@@ -36,6 +38,7 @@ USAGE:
   favorite add <city>     Save a favorite city
   favorite list           List favorite cities
   favorite remove <city>  Remove a favorite city
+    history list           View recent searches
 
 OPTIONS:
   -h, --help         Show help
@@ -131,6 +134,31 @@ EXAMPLES:
         }
 
         console.log('Unknown favorite command. Use add or list.');
+        process.exitCode = 1;
+        return;
+    }
+
+    // Handle history commands
+    if (command === 'history') {
+        const action = positionals[1];
+
+        if (action === 'list') {
+            const history = await listHistory();
+
+            if (typeof history === 'string') {
+                console.log(history);
+            } else {
+                console.log('Your recent searches:');
+
+                history.forEach((city, index) => {
+                    console.log(`${index + 1}. ${city}`);
+                });
+            }
+
+            return;
+        }
+
+        console.log('Unknown history command. Use list.');
         process.exitCode = 1;
         return;
     }
