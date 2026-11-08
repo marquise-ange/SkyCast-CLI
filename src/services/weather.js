@@ -45,7 +45,13 @@ async function getCurrentWeather(location, units = 'metric') {
         throw new Error(`Weather API error: ${response.status}`);
     }
 
-    const data = await response.json();
+    let data;
+
+    try {
+        data = await response.json();
+    } catch {
+        throw new Error('The weather service returned an invalid response.');
+    }
 
     if (!data.current) {
         throw new Error('Weather information is unavailable.');
@@ -90,7 +96,13 @@ async function getForecast(location, units = 'metric') {
         throw new Error(`Forecast API error: ${response.status}`);
     }
 
-    const data = await response.json();
+    let data;
+
+    try {
+        data = await response.json();
+    } catch {
+        throw new Error('The weather service returned an invalid response.');
+    }
 
     if (!data.daily) {
         throw new Error('Forecast information is unavailable.');
