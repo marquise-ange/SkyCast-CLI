@@ -4,6 +4,7 @@ import { addFavorite, listFavorites, removeFavorite } from './commands/favorites
 import { addHistory, listHistory } from './commands/history.js';
 import { getSettings, setUnits } from './commands/settings.js';
 import { showWeather } from './commands/weather.js';
+import { showForecast } from './commands/forecast.js';
 
 async function startSkyCast() {
     const { values, positionals } = parseArgs({
@@ -96,17 +97,23 @@ EXAMPLES:
     }
 
     // Handle forecast command
+
     if (command === 'forecast') {
         if (!city) {
-            console.log('Error: Please provide a city name.');
+            console.error('Error: Please provide a city name.');
             process.exitCode = 1;
             return;
         }
 
-        console.log(`Forecast requested for: ${city}`);
+        try {
+            await showForecast(city);
+        } catch (error) {
+            console.error(`Error: ${error.message}`);
+            process.exitCode = 1;
+        }
+
         return;
     }
-
     // Handle favorite commands
     if (command === 'favorite') {
         const action = positionals[1];

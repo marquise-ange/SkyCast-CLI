@@ -1,6 +1,6 @@
 import { REQUEST_TIMEOUT_MS } from '../config.js';
 
-const GEOCODING_URL ='https://geocoding-api.open-meteo.com/v1/search';
+const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 
 // Find a city's geographical coordinates
 async function searchCity(city) {
@@ -38,8 +38,13 @@ async function searchCity(city) {
         throw new Error(`Geocoding API error: ${response.status}`);
     }
 
-    const data = await response.json();
+    let data;
 
+    try {
+        data = await response.json();
+    } catch {
+        throw new Error('The geocoding service returned an invalid response.');
+    }
     if (!data.results || data.results.length === 0) {
         throw new Error(`No location found for "${normalizedCity}".`);
     }
