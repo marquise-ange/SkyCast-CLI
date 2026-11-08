@@ -1,7 +1,7 @@
 
 import { parseArgs } from 'node:util';
-
-function startSkyCast() {
+import { addFavorite, listFavorites, removeFavorite } from './commands/favorites.js';
+async function startSkyCast() {
     const { values, positionals } = parseArgs({
         args: process.argv.slice(2),
         options: {
@@ -29,9 +29,13 @@ Weather Intelligence From Your Terminal
 USAGE:
   skycast [command] [city]
 
-COMMANDS:
-  weather <city>     Get current weather
-  forecast <city>    Get weather forecast
+
+ COMMANDS:
+  weather <city>          Get current weather
+  forecast <city>         Get weather forecast
+  favorite add <city>     Save a favorite city
+  favorite list           List favorite cities
+  favorite remove <city>  Remove a favorite city
 
 OPTIONS:
   -h, --help         Show help
@@ -84,6 +88,52 @@ EXAMPLES:
         return;
     }
 
+    // Handle favorite commands
+    if (command === 'favorite') {
+        const action = positionals[1];
+        const favoriteCity = positionals[2];
+
+        if (action === 'add') {
+            if (!favoriteCity) {
+                console.log('Error: Please provide a city name.');
+                process.exitCode = 1;
+                return;
+            }
+
+            console.log(await addFavorite(favoriteCity));
+            return;
+        }
+
+        if (action === 'list') {
+            const favorites = await listFavorites();
+
+            if (typeof favorites === 'string') {
+                console.log(favorites);
+            } else {
+                console.log('Your favorite cities:');
+
+                favorites.forEach((city, index) => {
+                    console.log(`${index + 1}. ${city}`);
+                });
+            }
+
+            return;
+        }
+        if (action === 'remove') {
+            if (!favoriteCity) {
+                console.log('Error: Please provide a city name.');
+                process.exitCode = 1;
+                return;
+            }
+
+            console.log(await removeFavorite(favoriteCity));
+            return;
+        }
+
+        console.log('Unknown favorite command. Use add or list.');
+        process.exitCode = 1;
+        return;
+    }
     // Handle unknown commands
     console.log(`Error: Unknown command "${command}".`);
     console.log('Use --help to see available commands.');
