@@ -2,6 +2,7 @@
 import { parseArgs } from 'node:util';
 import { addFavorite, listFavorites, removeFavorite } from './commands/favorites.js';
 import { addHistory, listHistory } from './commands/history.js';
+import { getSettings, setUnits } from './commands/settings.js';
 
 async function startSkyCast() {
     const { values, positionals } = parseArgs({
@@ -38,7 +39,9 @@ USAGE:
   favorite add <city>     Save a favorite city
   favorite list           List favorite cities
   favorite remove <city>  Remove a favorite city
-    history list           View recent searches
+  history list           View recent searches
+  settings show          Display current settings
+  settings set <unit>    Change temperature unit
 
 OPTIONS:
   -h, --help         Show help
@@ -162,6 +165,43 @@ EXAMPLES:
         process.exitCode = 1;
         return;
     }
+
+    // Handle settings commands
+    if (command === 'settings') {
+        const action = positionals[1];
+
+        if (action === 'show') {
+            const settings = await getSettings();
+
+            console.log('Your SkyCast settings:');
+            console.log(`Temperature unit: ${settings.units}`);
+            return;
+        }
+
+        if (action === 'set') {
+            const unit = positionals[2];
+
+            if (!unit) {
+                console.log('Error: Please provide metric or imperial.');
+                process.exitCode = 1;
+                return;
+            }
+
+            const message = await setUnits(unit);
+            console.log(message);
+
+            if (!['metric', 'imperial'].includes(unit.toLowerCase())) {
+                process.exitCode = 1;
+            }
+
+            return;
+        }
+
+        console.log('Unknown settings command. Use show or set.');
+        process.exitCode = 1;
+        return;
+    }
+
     // Handle unknown commands
     console.log(`Error: Unknown command "${command}".`);
     console.log('Use --help to see available commands.');
