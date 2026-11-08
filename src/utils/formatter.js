@@ -53,4 +53,42 @@ Period: ${timeOfDay}
 `;
 }
 
-export { getWeatherDescription, formatCurrentWeather };
+// Format a 5-day weather forecast for terminal display
+function formatForecast(location, forecast) {
+    const daily = forecast.daily;
+    const units = forecast.daily_units;
+
+    let output = `
+=================================
+        SKYCAST FORECAST
+=================================
+
+Location: ${location.name}, ${location.country}
+
+`;
+
+    for (let i = 0; i < daily.time.length; i++) {
+        const date = new Date(`${daily.time[i]}T00:00:00`);
+
+        const day = date.toLocaleDateString('en-US', {
+            weekday: 'long'
+        });
+
+        const description = getWeatherDescription(
+            daily.weather_code[i]
+        );
+
+        output += `${day} (${daily.time[i]})
+Conditions: ${description}
+Maximum: ${daily.temperature_2m_max[i]}${units.temperature_2m_max}
+Minimum: ${daily.temperature_2m_min[i]}${units.temperature_2m_min}
+
+`;
+    }
+
+    output += '=================================\n';
+
+    return output;
+}
+
+export { getWeatherDescription, formatCurrentWeather, formatForecast };

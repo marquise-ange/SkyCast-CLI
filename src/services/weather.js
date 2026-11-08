@@ -1,3 +1,4 @@
+
 import { REQUEST_TIMEOUT_MS } from '../config.js';
 
 const WEATHER_URL = 'https://api.open-meteo.com/v1/forecast';
@@ -53,4 +54,49 @@ async function getCurrentWeather(location, units = 'metric') {
     return data;
 }
 
-export { getCurrentWeather };
+// Fetch a 5-day weather forecast
+async function getForecast(location, units = 'metric') {
+    const temperatureUnit =
+        units === 'imperial' ? 'fahrenheit' : 'celsius';
+
+    const params = new URLSearchParams({
+        latitude: String(location.latitude),
+        longitude: String(location.longitude),
+        daily: [
+            'weather_code',
+            'temperature_2m_max',
+            'temperature_2m_min'
+        ].join(','),
+        forecast_days: '5',
+        temperature_unit: temperatureUnit,
+        timezone: 'auto'
+    });
+
+    let response;
+
+    try {
+        response = await fetch(`${WEATHER_URL}?${params}`, {
+            signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+        });
+    } catch (error) {
+        if (error.name === 'TimeoutError') {
+            throw new Error('Forecast request timed out.');
+        }
+
+        throw new Error('Unable to connect to the weather service.');
+    }
+
+    if (!response.ok) {
+        throw new Error(`Forecast API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.daily) {
+        throw new Error('Forecast information is unavailable.');
+    }
+
+    return data;
+}
+
+export { getCurrentWeather, getForecast };
